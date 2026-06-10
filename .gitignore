@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+*.cover
+.hypothesis/
+.tox/
+*.log
+
+# Backend - Data & Uploads
+pipeline/backend/uploads/
+pipeline/backend/resumes_pdf_db/
+pipeline/backend/search_history.db
+pipeline/backend/resume_vectordb/
+
+# Node.js / Frontend
+node_modules/
+.next/
+out/
+.vercel
+dist/
+*.pem
+.env.local
+.env.*.local
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.production
+.env.development
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Project specific
+*.bak
+*.tmp
+.cache/
+temp/
+
+
+backend/CV_Abdelghafour_HASRI_page-0001.pdf
+backend/CV_Abdelghafour_HASRI.pdf
+backend/Image_91.pdf
+
+# model weights
+backend/content/final-v3-weights/model.safetensors
