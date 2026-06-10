@@ -607,7 +607,7 @@ typescript@5
 
 ## 📄 License
 
-This project is part of the PFM (Professional Fitness Module) system.
+None for now
 
 ## 👥 Project Team
 
