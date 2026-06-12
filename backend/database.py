@@ -3,12 +3,33 @@ from chromadb.utils import embedding_functions
 import uuid
 import re # We need Regex for the Natural Language search
 from config import CHROMADB_PATH
+import shutil
+from pathlib import Path
 
 class ResumeDatabase:
     def __init__(self, db_path=None):
         if db_path is None:
             db_path = str(CHROMADB_PATH)
-        self.client = chromadb.PersistentClient(path=db_path)
+        
+        # Try to create the client, if it fails due to corruption, reset the database
+        try:
+            self.client = chromadb.PersistentClient(path=db_path)
+        except BaseException as e:
+            print(f"ChromaDB initialization failed: {type(e).__name__}: {e}")
+            print("Resetting corrupted database...")
+            # Remove corrupted database
+            db_path_obj = Path(db_path)
+            if db_path_obj.exists():
+                shutil.rmtree(db_path_obj, ignore_errors=True)
+            # Create fresh database
+            db_path_obj.mkdir(parents=True, exist_ok=True)
+            # Retry with fresh database
+            try:
+                self.client = chromadb.PersistentClient(path=db_path)
+            except BaseException as e2:
+                print(f"Second attempt failed: {type(e2).__name__}: {e2}")
+                print("Using in-memory database instead...")
+                self.client = chromadb.EphemeralClient()
         
         self.embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name="paraphrase-multilingual-MiniLM-L12-v2"

@@ -1,6 +1,8 @@
 import torch
 from transformers import LayoutLMv3Processor, LayoutLMv3ForTokenClassification
 import fitz
+import os
+from pathlib import Path
 
 from extractor import extract_page_data
 from experience_calcul import calculate_total_experience
@@ -8,11 +10,29 @@ from constructor import assemble_entities
 from config import MODEL_PATH
 
 
+# Disable symlinks on Windows to avoid file locking issues
+os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = '1'
+
 print("Loading Model...")
 print(f"Model Path: {MODEL_PATH}")
 
-processor = LayoutLMv3Processor.from_pretrained(str(MODEL_PATH))
-model = LayoutLMv3ForTokenClassification.from_pretrained(str(MODEL_PATH))
+model_path = Path(MODEL_PATH)
+
+# Load processor with fallback - use base model's processor config if local is incomplete
+try:
+    processor = LayoutLMv3Processor.from_pretrained(str(MODEL_PATH), local_files_only=True)
+    print("Processor loaded from local weights")
+except:
+    print("Loading processor from HuggingFace base model...")
+    processor = LayoutLMv3Processor.from_pretrained("microsoft/layoutlmv3-base")
+
+# Load your trained model weights directly from local safetensors file
+if (model_path / 'model.safetensors').exists():
+    print("Loading trained model from local weights...")
+    model = LayoutLMv3ForTokenClassification.from_pretrained(str(MODEL_PATH), local_files_only=True)
+else:
+    print("Loading base model...")
+    model = LayoutLMv3ForTokenClassification.from_pretrained("microsoft/layoutlmv3-base")
 
 # Move model to GPU if available, otherwise CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
