@@ -8,7 +8,7 @@ interface CandidateCardProps {
 }
 
 export default function CandidateCard({ candidate, index }: CandidateCardProps) {
-  const confidencePercent = Math.round(candidate.confidence * 100);
+  const confidencePercent = Math.round((candidate.confidence ?? 0) * 100);
   const badgeBg =
     confidencePercent >= 80 ? "#1a1c1c" : confidencePercent >= 60 ? "#3a3d3d" : "#5a5d5d";
 

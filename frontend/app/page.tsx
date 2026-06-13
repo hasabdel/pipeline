@@ -83,8 +83,8 @@ export default function Home() {
           minWidth: 0,
         }}
       >
-        {/* Top Navigation */}
-        <TopNav />
+        {/* Top Navigation - only on search page */}
+        {currentPage === "search" && <TopNav />}
 
         {/* Center Content */}
         {currentPage === "dashboard" ? (

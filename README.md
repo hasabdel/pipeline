@@ -68,28 +68,30 @@ This project combines a **Python-based AI backend** with a **Next.js frontend** 
   - Delete individual searches or clear entire history
   - SQLite persistent storage for permanent history tracking
 
-- **Dashboard Page** (NEW): Overview and analytics
-  - Total candidates in the talent pool
-  - Average, maximum, and minimum experience statistics
-  - Recent searches overview
-  - Quick navigation to talent search
+- **Dashboard Page** (REDESIGNED - 2026-06-13): Bento-card style overview and analytics
+  - 3-column stat cards: Total Candidates, Average Experience, Max Experience
+  - Each card with progress bars, mini bar charts, and contextual info
+  - Recent searches table with query, matches, status columns
+  - Skill Distribution panel with progress bar visualizations
+  - Footer with disclaimer and policy links
+  - Built-in header with "Last 30 Days" filter and notification bell
 
 ### Frontend (Next.js UI)
-- Clean, modern interface built with React 19
+- Premium, modern bento-card interface built with React 19
 - **Key Components**:
-  - **Dashboard**: Overview page showing candidate statistics and recent searches
-  - **Sidebar**: Navigation with Dashboard, Talent Pool buttons; Search History panel; Settings below user profile
-  - **TopNav**: Application header with branding
+  - **Dashboard**: Bento-card overview with stat cards, recent searches table, skill distribution
+  - **Sidebar**: RecruitAI branded sidebar with blue active-state nav, Dashboard/Talent Pool/Settings buttons, Search History panel, Upload Resumes
+  - **TopNav**: Application header with branding and connection status (search page only)
   - **ChatInput**: Natural language search interface
   - **SearchResults**: Display matching candidates
-  - **SearchHistory**: Expandable search history panel (integrated in Sidebar under Talent Pool)
+  - **SearchHistory**: Expandable search history panel (integrated in Sidebar)
   - **CandidateCard**: Individual candidate profile display
   - **HeroSection**: Welcome and main action area for search page
   - **Toast**: Notification system
 
-- **Styling**: Tailwind CSS v4 for responsive, modern design
+- **Styling**: Tailwind CSS v4 + custom CSS for bento-card design system
 - **State Management**: React Hooks (useState, useCallback)
-- **Styling**: ESLint configured for code quality
+- **Linting**: ESLint configured for code quality
 
 ## 📁 Project Structure
 
@@ -494,14 +496,15 @@ Table: search_history
 - Efficient querying by search_id or timestamp
 - Support for bulk operations (clear, delete)
 
-### Sidebar Organization (Reorganized - 2026-06-10)
-- **Top Navigation**:
+### Sidebar Organization (Redesigned - 2026-06-13)
+- **Logo**: Black rounded icon + "RecruitAI" / "Recruitment Engine" branding
+- **Top Navigation** (blue active-state highlight):
   - Dashboard - Navigate to overview dashboard
   - Talent Pool - Navigate to candidate search interface
-- **Resume Upload**: Large button to upload PDF resumes
-- **Search History Panel**: Expandable section under Talent Pool showing past searches
-- **Settings**: Moved below user profile section
-- **User Profile**: Alex Thorne (Senior Recruiter) at the bottom
+  - Settings - Settings page (placeholder)
+- **Search History Panel**: Expandable section showing past searches
+- **Resume Upload**: Full-width rounded black button
+- **User Profile**: Alex Thorne (Premium Plan) with logout icon at the bottom
 
 ### Backend Development
 1. Modify models and logic in `backend/` files
@@ -621,6 +624,8 @@ Built as an intelligent ATS solution combining:
 - [x] Search history tracking (COMPLETED - 2026-06-10)
 - [x] Dashboard with statistics (COMPLETED - 2026-06-10)
 - [x] Sidebar reorganization (COMPLETED - 2026-06-10)
+- [x] Dashboard visual redesign - bento-card layout (COMPLETED - 2026-06-13)
+- [x] Sidebar branding redesign - RecruitAI + blue active state (COMPLETED - 2026-06-13)
 - [ ] Batch resume processing
 - [ ] Advanced filtering and sorting
 - [ ] Candidate ranking algorithms
@@ -668,6 +673,6 @@ git push -u origin main
 
 ---
 
-**Last Updated**: 2026-06-10
+**Last Updated**: 2026-06-13
 **Project Status**: Active Development
-**Latest Changes**: Created centralized config.py for all backend paths
+**Latest Changes**: Dashboard visual redesign with bento-card layout, sidebar branding update

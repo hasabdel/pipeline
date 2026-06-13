@@ -559,6 +559,225 @@ body {
   background: #b0b0b0;
 }
 
+/* ── Bento Card ── */
+.bento-card {
+  background: #ffffff;
+  border: 1px solid #c4c7c7;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.bento-card:hover {
+  border-color: #000000;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Sidebar Active ── */
+.sidebar-active {
+  background-color: #dce2f3;
+  color: #151c27;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* ── Dashboard Layout ── */
+.dashboard-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 48px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+}
+
+.dashboard-title {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #000000;
+}
+
+.dashboard-subtitle {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #4c4546;
+  margin-top: 8px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.stat-label {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #4c4546;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.stat-suffix {
+  font-size: 18px;
+  font-weight: 400;
+  color: #4c4546;
+}
+
+.stat-growth {
+  font-size: 14px;
+  font-weight: 500;
+  color: #16a34a;
+  margin-left: 8px;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 4px;
+  background: #eeeeee;
+  border-radius: 9999px;
+  margin-top: 24px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #000000;
+  border-radius: 9999px;
+}
+
+.middle-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 24px;
+}
+
+.section-header {
+  padding: 24px;
+  border-bottom: 1px solid #cfc4c5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.table-header-row {
+  background: #f3f3f3;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #4c4546;
+}
+
+.table-cell {
+  padding: 16px 24px;
+}
+
+.table-row {
+  border-bottom: 1px solid #cfc4c5;
+  transition: background 0.15s ease;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: #ffffff;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  background: #eeeeee;
+  color: #1a1c1c;
+}
+
+.dashboard-footer {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid #cfc4c5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-footer p {
+  font-size: 14px;
+  color: #4c4546;
+  max-width: 500px;
+}
+
+.dashboard-footer a {
+  font-size: 14px;
+  color: #4c4546;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.dashboard-footer a:hover {
+  color: #000000;
+}
+
+/* ── Skill Distribution ── */
+.skill-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #eeeeee;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: #000000;
+  border-radius: 9999px;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .middle-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-scroll {
+    padding: 24px;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
 /* ── Animations ── */
 @keyframes toast-in {
   from { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.96); }
