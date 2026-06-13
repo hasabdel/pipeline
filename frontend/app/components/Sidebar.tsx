@@ -84,7 +84,7 @@ export default function Sidebar({
 
   const navItems = [
     { label: "Dashboard", icon: DashboardIcon, onClick: onNavigateToDashboard, isActive: currentPage === "dashboard" },
-    { label: "Talent Pool", icon: TalentIcon, onClick: onNavigateToSearch, isActive: currentPage === "search" },
+    { label: "Search", icon: TalentIcon, onClick: onNavigateToSearch, isActive: currentPage === "search" },
     { label: "Settings", icon: SettingsIcon, onClick: () => {}, isActive: false },
   ];
 

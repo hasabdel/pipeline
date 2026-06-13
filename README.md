@@ -71,7 +71,7 @@ This project combines a **Python-based AI backend** with a **Next.js frontend** 
 - **Dashboard Page** (REDESIGNED - 2026-06-13): Bento-card style overview and analytics
   - 3-column stat cards: Total Candidates, Average Experience, Max Experience
   - Each card with progress bars, mini bar charts, and contextual info
-  - Recent searches table with query, matches, status columns
+  - Recent searches table with query, matches, status columns (click to re-run search)
   - Skill Distribution panel with progress bar visualizations
   - Footer with disclaimer and policy links
   - Built-in header with "Last 30 Days" filter and notification bell
@@ -500,7 +500,7 @@ Table: search_history
 - **Logo**: Black rounded icon + "RecruitAI" / "Recruitment Engine" branding
 - **Top Navigation** (blue active-state highlight):
   - Dashboard - Navigate to overview dashboard
-  - Talent Pool - Navigate to candidate search interface
+  - Search - Navigate to candidate search interface (formerly Talent Pool)
   - Settings - Settings page (placeholder)
 - **Search History Panel**: Expandable section showing past searches
 - **Resume Upload**: Full-width rounded black button

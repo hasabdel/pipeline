@@ -9,9 +9,10 @@ import {
 
 interface DashboardProps {
   onNavigateToSearch: () => void;
+  onSelectSearch?: (query: string) => void;
 }
 
-export default function Dashboard({ onNavigateToSearch }: DashboardProps) {
+export default function Dashboard({ onNavigateToSearch, onSelectSearch }: DashboardProps) {
   const [statistics, setStatistics] = useState<DashboardStatistics | null>(null);
   const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -322,7 +323,13 @@ export default function Dashboard({ onNavigateToSearch }: DashboardProps) {
                       key={search.search_id}
                       className="table-row"
                       style={{ cursor: "pointer" }}
-                      onClick={() => onNavigateToSearch()}
+                      onClick={() => {
+                        if (onSelectSearch) {
+                          onSelectSearch(search.query);
+                        } else {
+                          onNavigateToSearch();
+                        }
+                      }}
                     >
                       <td className="table-cell" style={{ fontWeight: 500, color: "#000000", fontSize: 16 }}>
                         {search.query}

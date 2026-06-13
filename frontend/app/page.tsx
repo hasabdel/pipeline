@@ -41,6 +41,7 @@ export default function Home() {
   }, []);
 
   const handleSelectSearch = useCallback((query: string) => {
+    setCurrentPage("search");
     setChipValue(query);
     handleSearch(query, false);  // Don't save to history when re-running previous searches
   }, [handleSearch]);
@@ -51,6 +52,9 @@ export default function Home() {
 
   const handleNavigateToSearch = useCallback(() => {
     setCurrentPage("search");
+    setResults(null);
+    setLastQuery("");
+    setChipValue(undefined);
   }, []);
 
   return (
@@ -88,7 +92,7 @@ export default function Home() {
 
         {/* Center Content */}
         {currentPage === "dashboard" ? (
-          <Dashboard onNavigateToSearch={handleNavigateToSearch} />
+          <Dashboard onNavigateToSearch={handleNavigateToSearch} onSelectSearch={handleSelectSearch} />
         ) : (
           <div
             style={{
