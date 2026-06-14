@@ -16,7 +16,7 @@ app = FastAPI(title="AI ATS Engine API")
 # ==========================================
 # CORS CONFIGURATION (Crucial for Next.js)
 # ==========================================
-# This allows your Next.js frontend (running on port 3000) 
+# This allows your Next.js frontend (running on port 3000)
 # to talk to this Python backend (running on port 8000)
 app.add_middleware(
     CORSMiddleware,

@@ -55,37 +55,51 @@ This project combines a **Python-based AI backend** with a **Next.js frontend** 
   - Stores processed candidate profiles
   - Semantic search capabilities using embeddings
   - Multi-language support (paraphrase-multilingual-MiniLM-L12-v2)
+  - Resume files permanently stored in `backend/resumes_pdf_db/` with absolute paths tracked in metadata
 
 - **Natural Language Search**: Recruiters can search for candidates using conversational queries
   - Extracts experience requirements from queries
   - Matches candidates based on skills and experience
-  - Returns ranked results by relevance
+  - Returns ranked results by **confidence score** (cosine similarity derived from vector distance)
+  - Confidence formula: `cosine_similarity = 1 - (distance / 2)` for normalized embeddings
+  - Distance 0.0 = 100% confidence, distance 0.8 = 60% confidence
 
 - **Search History Management**: Keep track of all past searches
   - Automatically saves every search query and results with timestamps
-  - View search history in expandable sidebar panel (under Talent Pool)
+  - View search history in expandable sidebar panel
+  - Dedicated full-page search history browser (via Dashboard "View All" button)
   - Re-run previous searches with one click
   - Delete individual searches or clear entire history
   - SQLite persistent storage for permanent history tracking
+
+- **Resume Management** (NEW - 2026-06-14): Manage candidates in the database
+  - Accessible via the "Settings" button in the sidebar
+  - Search bar to filter candidates by name, email, or filename
+  - Delete individual resumes from both ChromaDB and the physical `resumes_pdf_db` folder
+  - Confirmation dialog to prevent accidental deletions
 
 - **Dashboard Page** (REDESIGNED - 2026-06-13): Bento-card style overview and analytics
   - 3-column stat cards: Total Candidates, Average Experience, Max Experience
   - Each card with progress bars, mini bar charts, and contextual info
   - Recent searches table with query, matches, status columns (click to re-run search)
+  - "View All" button opens dedicated search history page
   - Skill Distribution panel with progress bar visualizations
   - Footer with disclaimer and policy links
   - Built-in header with "Last 30 Days" filter and notification bell
 
 ### Frontend (Next.js UI)
 - Premium, modern bento-card interface built with React 19
+- **Pages**: Dashboard, Search, Settings (Manage Database), Search History
 - **Key Components**:
   - **Dashboard**: Bento-card overview with stat cards, recent searches table, skill distribution
-  - **Sidebar**: RecruitAI branded sidebar with blue active-state nav, Dashboard/Talent Pool/Settings buttons, Search History panel, Upload Resumes
+  - **Sidebar**: RecruitAI branded sidebar with blue active-state nav, Dashboard/Search/Settings buttons, Search History panel, Upload Resumes
   - **TopNav**: Application header with branding and connection status (search page only)
   - **ChatInput**: Natural language search interface
-  - **SearchResults**: Display matching candidates
+  - **SearchResults**: Display matching candidates with confidence % badges
   - **SearchHistory**: Expandable search history panel (integrated in Sidebar)
-  - **CandidateCard**: Individual candidate profile display
+  - **AllSearchHistory**: Full-page search history browser with delete and clear-all actions (NEW)
+  - **Settings**: Manage Database page — search and delete resumes from DB and filesystem (NEW)
+  - **CandidateCard**: Individual candidate profile display with confidence score
   - **HeroSection**: Welcome and main action area for search page
   - **Toast**: Notification system
 
@@ -117,21 +131,24 @@ pipeline/
 │   │       ├── processor_config.json
 │   │       ├── tokenizer_config.json
 │   │       └── tokenizer.json
+│   ├── resumes_pdf_db/             # Permanent resume PDF storage
 │   ├── resume_vectordb/            # ChromaDB persistent storage
 │   └── uploads/                    # Temporary resume storage
 │
 └── frontend/
     ├── app/
-    │   ├── page.tsx                # Main page component
+    │   ├── page.tsx                # Main page component (routes: dashboard, search, settings, history)
     │   ├── layout.tsx              # Root layout
     │   ├── globals.css             # Global styles
     │   ├── components/             # React components
+    │   │   ├── AllSearchHistory.tsx     # Full-page search history browser (NEW)
     │   │   ├── CandidateCard.tsx
     │   │   ├── ChatInput.tsx
-    │   │   ├── Dashboard.tsx            # Dashboard overview page (NEW)
+    │   │   ├── Dashboard.tsx            # Dashboard overview page
     │   │   ├── HeroSection.tsx
-    │   │   ├── SearchHistory.tsx        # Search history panel
+    │   │   ├── SearchHistory.tsx        # Search history panel (sidebar)
     │   │   ├── SearchResults.tsx
+    │   │   ├── Settings.tsx             # Manage Database page (NEW)
     │   │   ├── Sidebar.tsx
     │   │   ├── Toast.tsx
     │   │   └── TopNav.tsx
@@ -174,6 +191,8 @@ pipeline/
 | `POST` | `/api/upload` | Upload and process a resume PDF |
 | `POST` | `/api/search` | Search candidates with natural language query |
 | `GET` | `/api/statistics` | Get dashboard statistics and recent searches |
+| `GET` | `/api/candidates?q={query}` | List all candidates, optionally filtered by search string (NEW) |
+| `DELETE` | `/api/candidates/{doc_id}` | Delete a candidate from DB and filesystem (NEW) |
 | `GET` | `/api/search-history` | Retrieve all search history (most recent first) |
 | `GET` | `/api/search-history/{search_id}` | Retrieve specific search by ID with results |
 | `DELETE` | `/api/search-history/{search_id}` | Delete a specific search from history |
@@ -225,7 +244,8 @@ Response:
       "email": "john@example.com",
       "experience_years": 5.5,
       "distance_score": 0.125,
-      "source_file": "john_doe.pdf"
+      "confidence": 0.844,
+      "source_file": "d:\\LaFac\\PFM\\pipeline\\backend\\resumes_pdf_db\\john_doe.pdf"
     }
   ]
 }
@@ -431,7 +451,13 @@ Modify the CORS settings in [api.py](backend/api.py#L13-L19) if you need to chan
 - Extract experience requirements from queries
 - Match candidates by skills, experience, and education
 - Multi-language support for diverse candidate pools
-- Confidence scoring for relevance ranking
+- **Confidence scoring** (NEW): Squared L2 distance is converted to cosine similarity for normalized embeddings
+  - Formula: `confidence = 1 - (distance / 2)` (clamped to [0, 1])
+  - Based on the identity: for unit vectors, L2² = 2 × (1 - cosine_similarity)
+  - Distance 0.0 = 100% confidence (perfect match)
+  - Distance 0.2 = 90% confidence
+  - Distance 0.4 = 80% confidence
+  - Distance 0.8 = 60% confidence (threshold cutoff)
 
 ## 📊 Data Models
 
@@ -447,8 +473,9 @@ interface CandidateMatch {
   name: string;
   email: string;
   experience_years: number;
-  confidence: number;
-  source_file: string;
+  confidence: number;       // 0.0 to 1.0 (cosine similarity from normalized embeddings)
+  distance_score: number;   // raw squared L2 distance (0.0 to 0.8)
+  source_file: string;      // absolute path to PDF in resumes_pdf_db
 }
 ```
 
@@ -496,12 +523,12 @@ Table: search_history
 - Efficient querying by search_id or timestamp
 - Support for bulk operations (clear, delete)
 
-### Sidebar Organization (Redesigned - 2026-06-13)
+### Sidebar Organization (Updated - 2026-06-14)
 - **Logo**: Black rounded icon + "RecruitAI" / "Recruitment Engine" branding
 - **Top Navigation** (blue active-state highlight):
   - Dashboard - Navigate to overview dashboard
-  - Search - Navigate to candidate search interface (formerly Talent Pool)
-  - Settings - Settings page (placeholder)
+  - Search - Navigate to candidate search interface
+  - Settings - Navigate to Manage Database page (search & delete resumes)
 - **Search History Panel**: Expandable section showing past searches
 - **Resume Upload**: Full-width rounded black button
 - **User Profile**: Alex Thorne (Premium Plan) with logout icon at the bottom
@@ -626,9 +653,12 @@ Built as an intelligent ATS solution combining:
 - [x] Sidebar reorganization (COMPLETED - 2026-06-10)
 - [x] Dashboard visual redesign - bento-card layout (COMPLETED - 2026-06-13)
 - [x] Sidebar branding redesign - RecruitAI + blue active state (COMPLETED - 2026-06-13)
+- [x] Resume management - search & delete from DB and filesystem (COMPLETED - 2026-06-14)
+- [x] Full search history page with delete & clear-all (COMPLETED - 2026-06-14)
+- [x] Confidence scoring - distance-to-confidence conversion (COMPLETED - 2026-06-14)
+- [x] Resume source tracking - absolute paths in resumes_pdf_db (COMPLETED - 2026-06-14)
 - [ ] Batch resume processing
 - [ ] Advanced filtering and sorting
-- [ ] Candidate ranking algorithms
 - [ ] Interview scheduling integration
 - [ ] Email notifications
 - [ ] Analytics dashboard with charts
@@ -673,6 +703,6 @@ git push -u origin main
 
 ---
 
-**Last Updated**: 2026-06-13
+**Last Updated**: 2026-06-14
 **Project Status**: Active Development
-**Latest Changes**: Dashboard visual redesign with bento-card layout, sidebar branding update
+**Latest Changes**: Resume management page, full search history browser, confidence scoring, resume source path tracking

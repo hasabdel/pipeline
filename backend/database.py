@@ -83,17 +83,33 @@ class ResumeDatabase:
             
             # THE THRESHOLD: Only keep them if the distance is LOW enough!
             if distance <= max_distance:
+                # Convert squared L2 distance to cosine similarity (confidence).
+                # Sentence Transformers (paraphrase-multilingual-MiniLM-L12-v2) produces
+                # normalized (unit) vectors. For unit vectors:
+                #   L2² = 2 * (1 - cosine_similarity)
+                # Therefore:
+                #   cosine_similarity = 1 - (distance / 2)
+                #
+                # | Distance | Cosine Similarity | Confidence |
+                # |----------|-------------------|------------|
+                # | 0.0      | 1.00              | 100%       |
+                # | 0.2      | 0.90              | 90%        |
+                # | 0.4      | 0.80              | 80%        |
+                # | 0.8      | 0.60              | 60%        |
+                confidence = max(0.0, min(1.0, 1.0 - (distance / 2.0)))
+                
                 candidate = {
                     "name": metadata['name'],
                     "email": metadata['email'],
                     "experience_years": metadata['experience_years'],
-                    "distance_score": round(distance, 3), # Keep it precise
+                    "distance_score": round(distance, 3),
+                    "confidence": round(confidence, 3),
                     "source_file": metadata['source_file']
                 }
                 final_candidates.append(candidate)
                 
-        # Sort them so the LOWEST distance (best match) is at the top!
-        final_candidates = sorted(final_candidates, key=lambda x: x['distance_score'])
+        # Sort by HIGHEST confidence (best match) first
+        final_candidates = sorted(final_candidates, key=lambda x: x['confidence'], reverse=True)
         
         return final_candidates
 
