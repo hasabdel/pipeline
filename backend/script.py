@@ -119,23 +119,3 @@ def process_resume(pdf_path):
     ai_extracted_data["EXPERIENCE_YEARS"] = calculate_total_experience(raw_exp_dates)
     
     return ai_extracted_data
-
-
-# ==========================================
-# TEST IT OUT!
-# ==========================================
-if __name__ == "__main__":
-    # test_pdf = "pipeline/backend/Image_91.pdf" 
-    
-    # final_json = process_resume(test_pdf)
-
-    db = ResumeDatabase()
-    
-    # db.insert_resume(final_json, source_file=test_pdf)
-
-    user_prompt = "doctor"
-    
-    search_results = db.search_candidates(user_prompt)
-    
-    print("\n--- MATCHING CANDIDATES ---")
-    print(search_results)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { uploadResume } from "../lib/api";
+import { uploadResume, fetchEmailResumes } from "../lib/api";
 import SearchHistory from "./SearchHistory";
 
 interface SidebarProps {
@@ -39,6 +39,20 @@ export default function Sidebar({
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  };
+
+  const [isFetchingEmails, setIsFetchingEmails] = useState(false);
+
+  const handleFetchEmails = async () => {
+    setIsFetchingEmails(true);
+    try {
+      const result = await fetchEmailResumes();
+      onUploadSuccess(result.message);
+    } catch (error) {
+      onUploadSuccess("Failed to fetch emails. Check backend connection and .env config.");
+    } finally {
+      setIsFetchingEmails(false);
     }
   };
 
@@ -187,7 +201,7 @@ export default function Sidebar({
       </nav>
 
       {/* Upload Button */}
-      <div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <button
           id="upload-resume-btn"
           onClick={() => fileInputRef.current?.click()}
@@ -238,6 +252,36 @@ export default function Sidebar({
           onChange={handleFileSelect}
           id="file-upload-input"
         />
+
+        {/* Fetch Emails Button */}
+        <button
+          onClick={handleFetchEmails}
+          disabled={isFetchingEmails}
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: 8,
+            border: "1px solid #cfc4c5",
+            backgroundColor: "#ffffff",
+            color: "#1a1c1c",
+            fontWeight: 600,
+            fontSize: 14,
+            cursor: isFetchingEmails ? "not-allowed" : "pointer",
+            opacity: isFetchingEmails ? 0.7 : 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            transition: "all 0.2s",
+          }}
+        >
+          {/* Email icon */}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          {isFetchingEmails ? "Fetching…" : "Fetch Email Resumes"}
+        </button>
       </div>
 
       {/* Footer - User Profile */}

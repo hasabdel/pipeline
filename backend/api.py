@@ -10,6 +10,7 @@ from model import process_resume
 from database import ResumeDatabase
 from search_history_db import SearchHistory
 from config import UPLOAD_DIR, RESUMES_DIR, ensure_directories
+from email_service import fetch_and_process_emails
 
 app = FastAPI(title="AI ATS Engine API")
 
@@ -213,14 +214,24 @@ async def delete_candidate(doc_id: str):
                 raise HTTPException(status_code=404, detail=message)
             raise HTTPException(status_code=500, detail=message)
             
-        return {
-            "status": "success",
-            "message": message
-        }
+        db.delete_resume(doc_id)
+        return {"status": "success", "message": f"Candidate {doc_id} deleted successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/fetch-emails")
+async def fetch_emails_endpoint():
+    """Fetch PDF resumes from email inbox and process them through the AI pipeline."""
+    try:
+        result = fetch_and_process_emails(db)
+        if result["status"] == "error":
+            raise HTTPException(status_code=500, detail=result["message"])
+        return result
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # ==========================================
 # SERVER LAUNCH

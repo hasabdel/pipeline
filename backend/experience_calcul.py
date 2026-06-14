@@ -80,20 +80,3 @@ def calculate_total_experience(exp_date_strings):
     # Calculate exactly
     total_days = sum((end - start).days + 1 for start, end in merged) # +1 includes the final day
     return round(total_days / 365.25, 1)
-
-
-
-
-# if __name__ == "__main__":
-#     # Imagine your LayoutLMv4 model outputted this JSON array for EXP-DATE:
-#     ai_extracted_dates = [
-#         "2024 - 2025",
-#         "February 2025",
-#         "July - August 2024",
-#         "fév 2026"
-#     ]
-    
-#     years = calculate_total_experience(ai_extracted_dates)
-    
-#     print(f"Extracted Dates: {ai_extracted_dates}")
-#     print(f"Total True Experience: {years} Years")

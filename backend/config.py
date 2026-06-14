@@ -7,6 +7,9 @@ Change paths here instead of modifying each individual file.
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ==========================================
 # BASE PATHS
@@ -59,6 +62,21 @@ def ensure_directories():
 ensure_directories()
 
 # ==========================================
+# EMAIL PIPELINE CONFIGURATION
+# ==========================================
+
+# Email pipeline database (tracks which emails have been processed)
+EMAIL_PIPELINE_DB_PATH = BACKEND_DIR / "email_pipeline.db"
+
+# IMAP Settings (loaded from .env file)
+IMAP_HOST = os.getenv("IMAP_HOST", "imap.gmail.com")
+IMAP_PORT = int(os.getenv("IMAP_PORT", 993))
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
+MAILBOX = os.getenv("MAILBOX", "INBOX")
+MARK_SEEN = os.getenv("MARK_SEEN", "true").lower() == "true"
+
+# ==========================================
 # PATH STRINGS FOR LOGGING/DISPLAY
 # ==========================================
 
@@ -74,4 +92,7 @@ def log_paths():
     print(f"Search History DB: {SEARCH_HISTORY_DB_PATH}")
     print(f"Upload Dir: {UPLOAD_DIR}")
     print(f"Resumes Dir: {RESUMES_DIR}")
+    print(f"Email Pipeline DB: {EMAIL_PIPELINE_DB_PATH}")
+    print(f"IMAP Host: {IMAP_HOST}")
+    print(f"Email User: {EMAIL_USER or '(not set)'}")
     print("="*60 + "\n")

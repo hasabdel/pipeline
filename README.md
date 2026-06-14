@@ -72,6 +72,12 @@ This project combines a **Python-based AI backend** with a **Next.js frontend** 
   - Delete individual searches or clear entire history
   - SQLite persistent storage for permanent history tracking
 
+- **Email Ingestion Pipeline** (NEW - 2026-06-14): Automatically import resumes from email
+  - Connects to IMAP inboxes (e.g., Gmail) to fetch PDF attachments
+  - Tracks processed emails to prevent duplicates (SHA-256 deduplication)
+  - Seamlessly integrates with the AI pipeline for automatic extraction and indexing
+  - Triggerable directly from the frontend sidebar
+
 - **Resume Management** (NEW - 2026-06-14): Manage candidates in the database
   - Accessible via the "Settings" button in the sidebar
   - Search bar to filter candidates by name, email, or filename
@@ -114,7 +120,8 @@ pipeline/
 ├── .gitignore                      # Git ignore file for clean commits
 ├── backend/
 │   ├── api.py                      # FastAPI main application
-│   ├── config.py                   # Centralized path configuration (NEW)
+│   ├── config.py                   # Centralized path configuration
+│   ├── email_service.py            # IMAP email ingestion service (NEW)
 │   ├── model.py                    # LayoutLMv3 model initialization
 │   ├── database.py                 # ChromaDB integration & resume processing
 │   ├── search_history_db.py        # Search history management
@@ -189,6 +196,7 @@ pipeline/
 |--------|----------|-------------|
 | `GET` | `/` | Health check - verify API is running |
 | `POST` | `/api/upload` | Upload and process a resume PDF |
+| `POST` | `/api/fetch-emails` | Fetch PDF resumes from email and process them (NEW) |
 | `POST` | `/api/search` | Search candidates with natural language query |
 | `GET` | `/api/statistics` | Get dashboard statistics and recent searches |
 | `GET` | `/api/candidates?q={query}` | List all candidates, optionally filtered by search string (NEW) |
@@ -657,6 +665,7 @@ Built as an intelligent ATS solution combining:
 - [x] Full search history page with delete & clear-all (COMPLETED - 2026-06-14)
 - [x] Confidence scoring - distance-to-confidence conversion (COMPLETED - 2026-06-14)
 - [x] Resume source tracking - absolute paths in resumes_pdf_db (COMPLETED - 2026-06-14)
+- [x] Email ingestion integration - fetch and process PDFs from IMAP (COMPLETED - 2026-06-14)
 - [ ] Batch resume processing
 - [ ] Advanced filtering and sorting
 - [ ] Interview scheduling integration
