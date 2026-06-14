@@ -75,15 +75,17 @@ async def upload_and_process_resume(file: UploadFile = File(...)):
         print(f"Server processing new upload: {file.filename}")
         parsed_json = process_resume(file_path_str)
 
-        # 3. Insert into the Vector Database
-        db.insert_resume(parsed_json, source_file=file.filename)
+        # Define permanent storage path
+        filename = Path(file_path_str).name
+        new_path = RESUMES_DIR / filename
+
+        # 3. Insert into the Vector Database with the permanent path
+        db.insert_resume(parsed_json, source_file=str(new_path))
 
         # 4. Return a success message to the Next.js frontend
         name = parsed_json.get("NAME", ["Unknown"])[0] if parsed_json.get("NAME") else "Unknown"
         
         # 5. Move to permanent storage
-        filename = Path(file_path_str).name
-        new_path = RESUMES_DIR / filename
         shutil.move(file_path_str, str(new_path))
         
         return {
@@ -186,6 +188,37 @@ async def get_statistics():
             "statistics": stats,
             "recent_searches": recent_searches
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/candidates")
+async def get_all_candidates(q: str = None):
+    """Retrieve all candidates, optionally filtered by a search string."""
+    try:
+        candidates = db.get_all_candidates(search_query=q)
+        return {
+            "status": "success",
+            "candidates": candidates
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/candidates/{doc_id}")
+async def delete_candidate(doc_id: str):
+    """Delete a candidate from the vector database and filesystem."""
+    try:
+        success, message = db.delete_candidate(doc_id)
+        if not success:
+            if message == "Candidate not found":
+                raise HTTPException(status_code=404, detail=message)
+            raise HTTPException(status_code=500, detail=message)
+            
+        return {
+            "status": "success",
+            "message": message
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -5,9 +5,10 @@ import { uploadResume } from "../lib/api";
 import SearchHistory from "./SearchHistory";
 
 interface SidebarProps {
-  currentPage: "dashboard" | "search";
+  currentPage: "dashboard" | "search" | "settings" | "history";
   onNavigateToDashboard: () => void;
   onNavigateToSearch: () => void;
+  onNavigateToSettings: () => void;
   onUploadSuccess: (message: string) => void;
   onSelectSearch?: (query: string) => void;
 }
@@ -16,6 +17,7 @@ export default function Sidebar({
   currentPage, 
   onNavigateToDashboard, 
   onNavigateToSearch,
+  onNavigateToSettings,
   onUploadSuccess, 
   onSelectSearch 
 }: SidebarProps) {
@@ -85,7 +87,7 @@ export default function Sidebar({
   const navItems = [
     { label: "Dashboard", icon: DashboardIcon, onClick: onNavigateToDashboard, isActive: currentPage === "dashboard" },
     { label: "Search", icon: TalentIcon, onClick: onNavigateToSearch, isActive: currentPage === "search" },
-    { label: "Settings", icon: SettingsIcon, onClick: () => {}, isActive: false },
+    { label: "Settings", icon: SettingsIcon, onClick: onNavigateToSettings, isActive: currentPage === "settings" },
   ];
 
   return (

@@ -4,6 +4,8 @@ import { useState, useCallback } from "react";
 import Sidebar from "./components/Sidebar";
 import TopNav from "./components/TopNav";
 import Dashboard from "./components/Dashboard";
+import Settings from "./components/Settings";
+import AllSearchHistory from "./components/AllSearchHistory";
 import HeroSection from "./components/HeroSection";
 import SearchResults from "./components/SearchResults";
 import ChatInput from "./components/ChatInput";
@@ -11,7 +13,7 @@ import Toast from "./components/Toast";
 import { searchCandidates, CandidateMatch } from "./lib/api";
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState<"dashboard" | "search">("search");
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "search" | "settings" | "history">("search");
   const [results, setResults] = useState<CandidateMatch[] | null>(null);
   const [lastQuery, setLastQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -57,6 +59,14 @@ export default function Home() {
     setChipValue(undefined);
   }, []);
 
+  const handleNavigateToSettings = useCallback(() => {
+    setCurrentPage("settings");
+  }, []);
+
+  const handleNavigateToHistory = useCallback(() => {
+    setCurrentPage("history");
+  }, []);
+
   return (
     <div
       style={{
@@ -71,6 +81,7 @@ export default function Home() {
         currentPage={currentPage}
         onNavigateToDashboard={handleNavigateToDashboard}
         onNavigateToSearch={handleNavigateToSearch}
+        onNavigateToSettings={handleNavigateToSettings}
         onUploadSuccess={handleUploadSuccess} 
         onSelectSearch={handleSelectSearch} 
       />
@@ -92,7 +103,15 @@ export default function Home() {
 
         {/* Center Content */}
         {currentPage === "dashboard" ? (
-          <Dashboard onNavigateToSearch={handleNavigateToSearch} onSelectSearch={handleSelectSearch} />
+          <Dashboard 
+            onNavigateToSearch={handleNavigateToSearch} 
+            onSelectSearch={handleSelectSearch} 
+            onViewAllSearches={handleNavigateToHistory}
+          />
+        ) : currentPage === "settings" ? (
+          <Settings />
+        ) : currentPage === "history" ? (
+          <AllSearchHistory onSelectSearch={handleSelectSearch} />
         ) : (
           <div
             style={{

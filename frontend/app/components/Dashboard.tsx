@@ -10,9 +10,10 @@ import {
 interface DashboardProps {
   onNavigateToSearch: () => void;
   onSelectSearch?: (query: string) => void;
+  onViewAllSearches?: () => void;
 }
 
-export default function Dashboard({ onNavigateToSearch, onSelectSearch }: DashboardProps) {
+export default function Dashboard({ onNavigateToSearch, onSelectSearch, onViewAllSearches }: DashboardProps) {
   const [statistics, setStatistics] = useState<DashboardStatistics | null>(null);
   const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -256,7 +257,10 @@ export default function Dashboard({ onNavigateToSearch, onSelectSearch }: Dashbo
             <h3 className="section-title">Recent Searches</h3>
             <button
               id="view-all-searches-btn"
-              onClick={onNavigateToSearch}
+              onClick={() => {
+                if (onViewAllSearches) onViewAllSearches();
+                else onNavigateToSearch();
+              }}
               style={{
                 background: "none",
                 border: "none",

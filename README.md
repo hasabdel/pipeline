@@ -474,7 +474,7 @@ Collection: candidates_multilingual
 │   ├── name: string
 │   ├── email: string
 │   ├── experience_years: float
-│   └── source_file: string
+│   └── source_file: string (absolute path to file in resumes_pdf_db)
 └── Embedding vector (384-dimensional for MiniLM)
 ```
 

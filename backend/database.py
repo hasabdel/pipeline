@@ -134,3 +134,68 @@ class ResumeDatabase:
                 "max_experience": 0.0,
                 "min_experience": 0.0
             }
+
+    def get_all_candidates(self, search_query=None):
+        """Retrieve all candidates, optionally filtered by a search string."""
+        try:
+            all_results = self.collection.get()
+            if not all_results['ids']:
+                return []
+                
+            candidates = []
+            for i in range(len(all_results['ids'])):
+                doc_id = all_results['ids'][i]
+                metadata = all_results['metadatas'][i]
+                
+                candidate = {
+                    "id": doc_id,
+                    "name": metadata.get('name', 'Unknown'),
+                    "email": metadata.get('email', 'Unknown'),
+                    "experience_years": metadata.get('experience_years', 0.0),
+                    "source_file": metadata.get('source_file', '')
+                }
+                
+                # Filter if query provided
+                if search_query:
+                    q = search_query.lower()
+                    if (q not in candidate['name'].lower() and 
+                        q not in candidate['email'].lower() and 
+                        q not in candidate['source_file'].lower()):
+                        continue
+                        
+                candidates.append(candidate)
+                
+            return candidates
+        except Exception as e:
+            print(f"Error getting candidates: {str(e)}")
+            return []
+            
+    def delete_candidate(self, doc_id: str):
+        """Delete a candidate from ChromaDB and remove their physical file."""
+        import os
+        try:
+            # 1. Get the candidate to find the physical file path
+            result = self.collection.get(ids=[doc_id])
+            if not result['ids']:
+                return False, "Candidate not found"
+                
+            metadata = result['metadatas'][0]
+            source_file = metadata.get('source_file', '')
+            
+            # 2. Delete from ChromaDB
+            self.collection.delete(ids=[doc_id])
+            print(f"✅ Deleted candidate {doc_id} from Vector DB.")
+            
+            # 3. Delete physical file if it exists
+            if source_file and os.path.exists(source_file):
+                try:
+                    os.remove(source_file)
+                    print(f"✅ Deleted physical file: {source_file}")
+                except OSError as e:
+                    print(f"⚠️ Could not delete physical file {source_file}: {e}")
+                    # Still return true since DB deletion worked
+            
+            return True, "Successfully deleted"
+        except Exception as e:
+            print(f"Error deleting candidate: {str(e)}")
+            return False, str(e)
