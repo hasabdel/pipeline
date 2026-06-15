@@ -70,7 +70,10 @@ Thumbs.db
 .Trashes
 ehthumbs.db
 *.db
-*.sqlite"
+*.sqlite
+*.sqlite3
+backend/resume_vectordb/3504d6cc-9792-4643-8ce0-c54e8b21a0e6
+
 
 # Project specific
 *.bak
